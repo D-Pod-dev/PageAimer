@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageAimer - Reading Goal Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 PageAimer</h1>
+            <p class="subtitle">Track your reading goals and stay on pace</p>
+        </header>
+
+        <main>
+            <!-- Create Goal Section -->
+            <section id="create-goal-section" class="card">
+                <h2>Create Your Reading Goal</h2>
+                <form id="goal-form">
+                    <div class="form-group">
+                        <label for="book-title">Book Title (optional)</label>
+                        <input type="text" id="book-title" placeholder="Enter book title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="target-page">Target Page Number *</label>
+                        <input type="number" id="target-page" required min="1" placeholder="e.g., 350">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="current-page">Current Page (optional)</label>
+                        <input type="number" id="current-page" min="0" placeholder="e.g., 50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="due-date">Due Date *</label>
+                        <input type="date" id="due-date" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Create Goal</button>
+                </form>
+            </section>
+
+            <!-- Goal Dashboard Section -->
+            <section id="goal-dashboard" class="card hidden">
+                <div class="goal-header">
+                    <h2 id="dashboard-title">Your Reading Goal</h2>
+                    <button id="reset-goal" class="btn btn-secondary">New Goal</button>
+                </div>
+                
+                <div class="goal-info">
+                    <div class="info-card">
+                        <span class="info-label">Target Page</span>
+                        <span class="info-value" id="display-target-page">-</span>
+                    </div>
+                    
+                    <div class="info-card">
+                        <span class="info-label">Current Page</span>
+                        <span class="info-value" id="display-current-page">-</span>
+                    </div>
+                    
+                    <div class="info-card">
+                        <span class="info-label">Due Date</span>
+                        <span class="info-value" id="display-due-date">-</span>
+                    </div>
+                    
+                    <div class="info-card">
+                        <span class="info-label">Days Remaining</span>
+                        <span class="info-value" id="display-days-remaining">-</span>
+                    </div>
+                </div>
+                
+                <div class="daily-goal">
+                    <h3>Daily Reading Goal</h3>
+                    <div class="daily-goal-value" id="daily-goal-pages">-</div>
+                    <p class="daily-goal-subtitle">pages per day</p>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text">0% complete</p>
+                </div>
+                
+                <div class="update-section">
+                    <h3>Update Your Progress</h3>
+                    <form id="update-form">
+                        <div class="form-group">
+                            <label for="new-current-page">New Current Page</label>
+                            <input type="number" id="new-current-page" required min="0" placeholder="Enter page number">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Progress</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Stay consistent and reach your reading goals! 📚</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
