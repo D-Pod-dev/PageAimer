@@ -3,7 +3,26 @@
 class ReadingGoalTracker {
     constructor() {
         this.goal = null;
+        this.lastCheckedDate = this.getTodayDateString();
         this.init();
+        this.setupDateWatcher();
+    }
+
+    getTodayDateString() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today.toISOString();
+    }
+
+    setupDateWatcher() {
+        // Check every minute if the date has changed
+        setInterval(() => {
+            const currentDate = this.getTodayDateString();
+            if (currentDate !== this.lastCheckedDate) {
+                this.lastCheckedDate = currentDate;
+                this.updateDisplay();
+            }
+        }, 60000); // 60,000 ms = 1 minute
     }
 
     init() {
