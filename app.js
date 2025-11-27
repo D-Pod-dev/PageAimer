@@ -20,6 +20,8 @@ class ReadingGoalTracker {
             const currentDate = this.getTodayDateString();
             if (currentDate !== this.lastCheckedDate) {
                 this.lastCheckedDate = currentDate;
+                // Update today's target when the day changes
+                this.updateTodaysTarget();
                 this.updateDisplay();
             }
         }, 60000); // 60,000 ms = 1 minute
@@ -28,6 +30,7 @@ class ReadingGoalTracker {
     init() {
         this.loadGoal();
         this.setupEventListeners();
+        this.updateTodaysTarget(); // Set today's target on init
         this.updateDisplay();
         this.setMinDate();
     }
@@ -94,11 +97,28 @@ class ReadingGoalTracker {
             createdDate: new Date().toISOString()
         };
 
+        // Set today's target immediately when goal is created
+        this.updateTodaysTarget();
         this.saveGoal();
         this.updateDisplay();
         
         // Clear form
         document.getElementById('goal-form').reset();
+    }
+
+    updateTodaysTarget() {
+        if (this.goal) {
+            const today = this.getTodayDateString();
+            // Only update if we don't have today's target or if the date has changed
+            if (!this.goal.todaysTarget || this.goal.todaysTargetDate !== today) {
+                // Store the current page at the time we set today's target
+                this.goal.todaysTargetBasePage = this.goal.currentPage;
+                const dailyGoal = this.calculateDailyGoal();
+                this.goal.todaysTarget = this.goal.currentPage + dailyGoal;
+                this.goal.todaysTargetDate = today;
+                this.saveGoal();
+            }
+        }
     }
 
     updateProgress() {
@@ -122,6 +142,7 @@ class ReadingGoalTracker {
             this.goal.currentPage = newCurrentPage;
         }
 
+        // Don't update today's target when progress is updated
         this.saveGoal();
         this.updateDisplay();
         
@@ -172,6 +193,46 @@ class ReadingGoalTracker {
         return Math.max(0, daysRemaining);
     }
 
+    getTodaysTargetPage() {
+        if (!this.goal) return 0;
+        
+        // Return the stored today's target if it exists and is for today
+        const today = this.getTodayDateString();
+        if (this.goal.todaysTarget && this.goal.todaysTargetDate === today) {
+            return this.goal.todaysTarget;
+        }
+        
+        // Fallback to calculated value (shouldn't happen if updateTodaysTarget is called properly)
+        const dailyGoal = this.calculateDailyGoal();
+        return this.goal.currentPage + dailyGoal;
+    }
+
+    getTodaysProgressStatus() {
+        if (!this.goal) return { message: '', status: '' };
+
+        const todaysTarget = this.getTodaysTargetPage();
+        const currentPage = this.goal.currentPage;
+        const pagesDifference = currentPage - todaysTarget;
+
+        if (pagesDifference < 0) {
+            const pagesLeft = Math.abs(pagesDifference);
+            return {
+                message: `${pagesLeft} page${pagesLeft === 1 ? '' : 's'} left to reach today's target`,
+                status: 'behind'
+            };
+        } else if (pagesDifference === 0) {
+            return {
+                message: "You've reached today's target! 🎯",
+                status: 'on-track'
+            };
+        } else {
+            return {
+                message: `You're ${pagesDifference} page${pagesDifference === 1 ? '' : 's'} ahead of today's target! 📚`,
+                status: 'ahead'
+            };
+        }
+    }
+
     getProgress() {
         if (!this.goal) return 0;
         
@@ -213,6 +274,16 @@ class ReadingGoalTracker {
             // Update daily goal
             const dailyGoal = this.calculateDailyGoal();
             document.getElementById('daily-goal-pages').textContent = dailyGoal;
+
+            // Update today's target
+            const todaysTarget = this.getTodaysTargetPage();
+            document.getElementById('today-target-page').textContent = todaysTarget;
+
+            // Update target progress message
+            const progressStatus = this.getTodaysProgressStatus();
+            const progressMessageEl = document.getElementById('target-progress-message');
+            progressMessageEl.textContent = progressStatus.message;
+            progressMessageEl.className = `target-progress-message ${progressStatus.status}`;
 
             // Update progress bar
             const progress = this.getProgress();
