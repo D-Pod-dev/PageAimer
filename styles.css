@@ -222,6 +222,10 @@ header h1 {
     background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
 }
 
+.goal-item.completed .goal-progress-target-fill {
+    background: rgba(40, 167, 69, 0.3);
+}
+
 .goal-completion-message {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
@@ -309,9 +313,13 @@ header h1 {
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    padding: 5px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .goal-menu-btn:hover {
@@ -377,14 +385,61 @@ header h1 {
     background: #e0e0e0;
     border-radius: 4px;
     margin: 0 15px;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
+}
+
+.goal-progress-target-fill {
+    position: absolute;
+    height: 100%;
+    background: rgba(102, 126, 234, 0.3);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+    z-index: 1;
+    cursor: pointer;
 }
 
 .goal-progress-fill {
+    position: absolute;
     height: 100%;
     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     transition: width 0.3s ease;
     border-radius: 4px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.goal-progress-tooltip {
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+    pointer-events: none;
+    bottom: 20px;
+    transform: translateX(-50%);
+}
+
+.goal-progress-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -3px;
+    border: 3px solid transparent;
+    border-top-color: #333;
+}
+
+.goal-progress-tooltip.show {
+    opacity: 1;
+    visibility: visible;
 }
 
 .goal-stats {
@@ -543,19 +598,70 @@ header h1 {
     height: 30px;
     background: #e0e0e0;
     border-radius: 15px;
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 10px;
+    position: relative;
+}
+
+.progress-target-fill {
+    position: absolute;
+    height: 100%;
+    background: rgba(102, 126, 234, 0.3);
+    transition: width 0.5s ease;
+    border-radius: 15px;
+    z-index: 1;
+    cursor: pointer;
 }
 
 .progress-fill {
+    position: absolute;
     height: 100%;
     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     transition: width 0.5s ease;
     border-radius: 15px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.progress-tooltip {
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+    pointer-events: none;
+    bottom: 45px;
+    transform: translateX(-50%);
+}
+
+.progress-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: #333;
+}
+
+.progress-tooltip.show {
+    opacity: 1;
+    visibility: visible;
 }
 
 .progress-fill.completed {
     background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.progress-target-fill.completed {
+    background: rgba(40, 167, 69, 0.3);
 }
 
 .progress-text {

@@ -43,7 +43,6 @@
                             <button id="select-all-completed" class="btn btn-secondary">Select All Completed</button>
                         </div>
                         <div class="bulk-actions-right">
-                            <button id="cancel-bulk-delete" class="btn btn-secondary">Cancel</button>
                             <button id="delete-selected-goals" class="btn btn-danger">Delete Selected</button>
                         </div>
                     </div>
@@ -147,7 +146,9 @@
                 
                 <div class="progress-section">
                     <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-target-fill" id="progress-target-fill" data-tooltip="today-target"></div>
+                        <div class="progress-fill" id="progress-fill" data-tooltip="current-progress"></div>
+                        <div class="progress-tooltip" id="progress-tooltip"></div>
                     </div>
                     <p class="progress-text" id="progress-text">0% complete</p>
                 </div>

@@ -127,11 +127,11 @@ class ReadingGoalTracker {
 
         // Bulk delete functionality
         document.getElementById('bulk-delete-toggle').addEventListener('click', () => {
-            this.toggleBulkDeleteMode();
-        });
-
-        document.getElementById('cancel-bulk-delete').addEventListener('click', () => {
-            this.exitBulkDeleteMode();
+            if (this.bulkDeleteMode) {
+                this.exitBulkDeleteMode();
+            } else {
+                this.toggleBulkDeleteMode();
+            }
         });
 
         document.getElementById('delete-selected-goals').addEventListener('click', () => {
@@ -148,10 +148,83 @@ class ReadingGoalTracker {
 
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.goal-menu-btn') && !e.target.closest('.goal-dropdown')) {
+            if (!e.target.closest('.goal-dropdown') && !e.target.closest('.goal-menu-btn')) {
                 this.closeAllDropdowns();
             }
         });
+        
+        // Setup tooltip event listeners
+        this.setupTooltipListeners();
+    }
+
+    setupTooltipListeners() {
+        // Use event delegation for dynamic content
+        document.addEventListener('mouseenter', (e) => {
+            if (e.target.dataset.tooltip) {
+                this.showTooltip(e.target, e.target.dataset.tooltip, e.target.dataset.goalId);
+            }
+        }, true);
+        
+        document.addEventListener('mouseleave', (e) => {
+            if (e.target.dataset.tooltip) {
+                this.hideTooltip(e.target);
+            }
+        }, true);
+    }
+
+    showTooltip(element, type, goalId = null) {
+        let tooltipElement, goal, message;
+        
+        // Determine if this is a goal progress bar or main dashboard progress bar
+        if (goalId) {
+            // Goal progress bar tooltip
+            goal = this.goals.find(g => g.id === goalId);
+            tooltipElement = element.parentElement.querySelector('.goal-progress-tooltip');
+        } else {
+            // Main dashboard progress bar tooltip
+            goal = this.goals.find(g => g.id === this.currentGoalId);
+            tooltipElement = document.getElementById('progress-tooltip');
+        }
+        
+        if (!goal || !tooltipElement) return;
+        
+        // Set tooltip message based on type
+        if (type === 'current-progress') {
+            message = `Current page: ${goal.currentPage}`;
+        } else if (type === 'today-target') {
+            const todaysTarget = this.getTodaysTargetPage(goal);
+            message = `Today's target page: ${todaysTarget}`;
+        }
+        
+        if (message) {
+            tooltipElement.textContent = message;
+            
+            // Position tooltip at the rightmost point of the hovered element
+            // Get the width percentage from the element's style
+            const widthMatch = element.style.width.match(/(\d+(?:\.\d+)?)%/);
+            const widthPercent = widthMatch ? parseFloat(widthMatch[1]) : 0;
+            
+            // Calculate position as percentage of parent width
+            tooltipElement.style.left = `${widthPercent}%`;
+            tooltipElement.classList.add('show');
+        }
+    }
+    
+    hideTooltip(element) {
+        const goalId = element.dataset.goalId;
+        let tooltipElement;
+        
+        if (goalId) {
+            // Goal progress bar tooltip
+            tooltipElement = element.parentElement.querySelector('.goal-progress-tooltip');
+        } else {
+            // Main dashboard progress bar tooltip
+            tooltipElement = document.getElementById('progress-tooltip');
+        }
+        
+        if (tooltipElement) {
+            tooltipElement.classList.remove('show');
+        }
     }
 
     showAllGoalsSection() {
@@ -545,6 +618,8 @@ class ReadingGoalTracker {
 
     createGoalElement(goal) {
         const progress = this.getProgress(goal);
+        const todaysTargetPage = this.getTodaysTargetPage(goal);
+        const todaysTargetProgress = Math.min(Math.round((todaysTargetPage / goal.targetPage) * 100), 100);
         const daysRemaining = this.getDaysRemaining(goal);
         const dailyGoal = this.calculateDailyGoal(goal);
         const isCompleted = this.isGoalCompleted(goal);
@@ -580,7 +655,9 @@ class ReadingGoalTracker {
             <div class="goal-progress">
                 <span class="goal-progress-text">${progress}%</span>
                 <div class="goal-progress-bar">
-                    <div class="goal-progress-fill" style="width: ${progress}%"></div>
+                    <div class="goal-progress-target-fill" style="width: ${todaysTargetProgress}%" data-tooltip="today-target" data-goal-id="${goal.id}"></div>
+                    <div class="goal-progress-fill" style="width: ${progress}%" data-tooltip="current-progress" data-goal-id="${goal.id}"></div>
+                    <div class="goal-progress-tooltip"></div>
                 </div>
                 <span class="goal-progress-text">${goal.currentPage}/${goal.targetPage}</span>
             </div>
@@ -722,13 +799,25 @@ class ReadingGoalTracker {
 
         // Update progress bar
         const progress = this.getProgress(goal);
+        const todaysTargetPage = this.getTodaysTargetPage(goal);
+        const todaysTargetProgress = Math.min(Math.round((todaysTargetPage / goal.targetPage) * 100), 100);
+        
         const progressFillEl = document.getElementById('progress-fill');
+        const progressTargetFillEl = document.getElementById('progress-target-fill');
+        
+        // Remove any existing data attributes and add fresh ones
+        progressFillEl.removeAttribute('data-goal-id');
+        progressTargetFillEl.removeAttribute('data-goal-id');
+        
         progressFillEl.style.width = `${progress}%`;
+        progressTargetFillEl.style.width = `${todaysTargetProgress}%`;
         
         if (isCompleted) {
             progressFillEl.classList.add('completed');
+            progressTargetFillEl.classList.add('completed');
         } else {
             progressFillEl.classList.remove('completed');
+            progressTargetFillEl.classList.remove('completed');
         }
         
         document.getElementById('progress-text').textContent = `${progress}% complete`;
