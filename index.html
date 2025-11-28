@@ -15,9 +15,47 @@
         </header>
 
         <main>
+            <!-- All Goals Section -->
+            <section id="all-goals-section" class="card">
+                <div class="goals-header">
+                    <h2>All Goals</h2>
+                    <div class="goals-header-actions">
+                        <button id="bulk-delete-toggle" class="btn btn-secondary hidden">Select Goals</button>
+                        <button id="add-new-goal" class="btn btn-primary-round" title="Add new goal">+</button>
+                    </div>
+                </div>
+                
+                <div id="goals-list" class="goals-list">
+                    <div id="no-goals-message" class="no-goals-message">
+                        <p>📖 No reading goals yet</p>
+                        <p class="no-goals-subtitle">Click the + button to create your first goal</p>
+                    </div>
+                </div>
+                
+                <div id="bulk-actions" class="bulk-actions hidden">
+                    <div class="bulk-actions-header">
+                        <div class="bulk-actions-left">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="select-all-goals">
+                                <span class="checkmark"></span>
+                                Select All
+                            </label>
+                            <button id="select-all-completed" class="btn btn-secondary">Select All Completed</button>
+                        </div>
+                        <div class="bulk-actions-right">
+                            <button id="cancel-bulk-delete" class="btn btn-secondary">Cancel</button>
+                            <button id="delete-selected-goals" class="btn btn-danger">Delete Selected</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Create Goal Section -->
-            <section id="create-goal-section" class="card">
-                <h2>Create Your Reading Goal</h2>
+            <section id="create-goal-section" class="card hidden">
+                <div class="section-header">
+                    <h2>Create New Reading Goal</h2>
+                    <button id="back-to-goals" class="btn btn-secondary">← Back to Goals</button>
+                </div>
                 <form id="goal-form">
                     <div class="form-group">
                         <label for="book-title">Book Title (optional)</label>
@@ -43,10 +81,39 @@
                 </form>
             </section>
 
+            <!-- Edit Goal Section -->
+            <section id="edit-goal-section" class="card hidden">
+                <div class="section-header">
+                    <h2>Edit Reading Goal</h2>
+                    <button id="back-from-edit" class="btn btn-secondary">← Back to Goals</button>
+                </div>
+                <form id="edit-goal-form">
+                    <div class="form-group">
+                        <label for="edit-book-title">Book Title (optional)</label>
+                        <input type="text" id="edit-book-title" placeholder="Enter book title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-target-page">Target Page Number *</label>
+                        <input type="number" id="edit-target-page" required min="1" placeholder="e.g., 350">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-due-date">Due Date *</label>
+                        <input type="date" id="edit-due-date" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update Goal</button>
+                </form>
+            </section>
+
             <!-- Goal Dashboard Section -->
             <section id="goal-dashboard" class="card hidden">
                 <div class="goal-header">
-                    <h2 id="dashboard-title">Your Reading Goal</h2>
+                    <div class="goal-header-left">
+                        <button id="back-from-dashboard" class="btn btn-secondary">← Back to Goals</button>
+                        <h2 id="dashboard-title">Your Reading Goal</h2>
+                    </div>
                     <button id="reset-goal" class="btn btn-secondary">New Goal</button>
                 </div>
                 
@@ -67,7 +134,7 @@
                     </div>
                     
                     <div class="info-card">
-                        <span class="info-label">Days Remaining</span>
+                        <span class="info-label" id="days-remaining-label">Days Remaining</span>
                         <span class="info-value" id="display-days-remaining">-</span>
                     </div>
                 </div>
