@@ -20,7 +20,7 @@
                 <div class="goals-header">
                     <h2>All Goals</h2>
                     <div class="goals-header-actions">
-                        <button id="bulk-delete-toggle" class="btn btn-secondary hidden">Select Goals</button>
+                        <button id="bulk-delete-toggle" class="btn btn-secondary hidden">Delete Goals</button>
                         <button id="add-new-goal" class="btn btn-primary-round" title="Add new goal">+</button>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                     
                     <div class="form-group">
                         <label for="target-page">Target Page Number *</label>
-                        <input type="number" id="target-page" required min="1" placeholder="e.g., 350">
+                        <input type="number" id="target-page" min="1" placeholder="e.g., 350">
                     </div>
                     
                     <div class="form-group">
@@ -73,7 +73,7 @@
                     
                     <div class="form-group">
                         <label for="due-date">Due Date *</label>
-                        <input type="date" id="due-date" required>
+                        <input type="date" id="due-date">
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Create Goal</button>
@@ -93,13 +93,18 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="edit-target-page">Target Page Number *</label>
-                        <input type="number" id="edit-target-page" required min="1" placeholder="e.g., 350">
+                        <label for="edit-target-page">Target Page Number (optional)</label>
+                        <input type="number" id="edit-target-page" min="1" placeholder="e.g., 350">
                     </div>
                     
                     <div class="form-group">
-                        <label for="edit-due-date">Due Date *</label>
-                        <input type="date" id="edit-due-date" required>
+                        <label for="edit-current-page">Current Page (optional)</label>
+                        <input type="number" id="edit-current-page" min="0" placeholder="e.g., 50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-due-date">Due Date (optional)</label>
+                        <input type="date" id="edit-due-date">
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Update Goal</button>
@@ -113,7 +118,7 @@
                         <button id="back-from-dashboard" class="btn btn-secondary">← Back to Goals</button>
                         <h2 id="dashboard-title">Your Reading Goal</h2>
                     </div>
-                    <button id="reset-goal" class="btn btn-secondary">New Goal</button>
+                    <button id="edit-goal-button" class="btn btn-secondary">Edit Goal</button>
                 </div>
                 
                 <div class="goal-info">
@@ -147,6 +152,7 @@
                 <div class="progress-section">
                     <div class="progress-bar">
                         <div class="progress-target-fill" id="progress-target-fill" data-tooltip="today-target"></div>
+                        <div class="progress-ahead-fill" id="progress-ahead-fill" data-tooltip="ahead-progress"></div>
                         <div class="progress-fill" id="progress-fill" data-tooltip="current-progress"></div>
                         <div class="progress-tooltip" id="progress-tooltip"></div>
                     </div>

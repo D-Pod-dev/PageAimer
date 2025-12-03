@@ -6,8 +6,8 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: Georgia, serif;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -21,19 +21,20 @@ body {
 /* Header */
 header {
     text-align: center;
-    color: white;
+    color: #444;
     margin-bottom: 30px;
 }
 
 header h1 {
     font-size: 3rem;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
     font-size: 1.2rem;
-    opacity: 0.9;
+    opacity: 0.8;
+    color: #666;
 }
 
 /* Card Styles */
@@ -41,12 +42,13 @@ header h1 {
     background: white;
     border-radius: 15px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
 }
 
 .card h2 {
-    color: #667eea;
+    color: #444;
     margin-bottom: 20px;
     font-size: 1.8rem;
 }
@@ -80,7 +82,7 @@ header h1 {
 
 .form-group input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #888;
 }
 
 /* Button Styles */
@@ -202,12 +204,12 @@ header h1 {
 
 .goal-item.completed {
     background: #d4edda;
-    border-color: #28a745;
+    border-color: #81c784;
 }
 
 .goal-item.overdue {
-    background: #f8d7da;
-    border-color: #dc3545;
+    background: #f8e8e8;
+    border-color: #ef9a9a;
 }
 
 .goal-item.completed .goal-item-title {
@@ -215,7 +217,7 @@ header h1 {
 }
 
 .goal-item.overdue .goal-item-title {
-    color: #721c24;
+    color: #b71c1c;
 }
 
 .goal-item.completed .goal-progress-fill {
@@ -224,6 +226,16 @@ header h1 {
 
 .goal-item.completed .goal-progress-target-fill {
     background: rgba(40, 167, 69, 0.3);
+}
+
+.goal-progress-ahead-fill {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+    z-index: 1;
+    cursor: pointer;
 }
 
 .goal-completion-message {
@@ -240,8 +252,16 @@ header h1 {
 .goal-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #667eea;
+    border-color: #ccc;
     z-index: 1000;
+}
+
+.goal-item.overdue:hover {
+    border-color: #e57373;
+}
+
+.goal-item.completed:hover {
+    border-color: #28a745;
 }
 
 .goal-item.dropdown-open {
@@ -271,8 +291,8 @@ header h1 {
 }
 
 .goal-item.selected {
-    border-color: #667eea;
-    background: #f0f4ff;
+    border-color: #888;
+    background: #f5f5f5;
 }
 
 .goal-item-header {
@@ -323,7 +343,7 @@ header h1 {
 }
 
 .goal-menu-btn:hover {
-    background: #e9ecef;
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .goal-dropdown {
@@ -407,6 +427,7 @@ header h1 {
     border-radius: 4px;
     z-index: 2;
     cursor: pointer;
+    box-shadow: 3px 0 4px rgba(0, 0, 0, 0.2);
 }
 
 .goal-progress-tooltip {
@@ -464,6 +485,27 @@ header h1 {
     font-size: 0.8rem;
     color: #777;
     margin-top: 2px;
+}
+
+/* Completed Goals Section */
+.completed-goals-section {
+    margin-top: 30px;
+}
+
+.completed-goals-separator {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #d0d0d0 50%, transparent 100%);
+    margin: 30px 0 20px 0;
+}
+
+.completed-goals-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    margin-bottom: 20px;
+    opacity: 0.8;
 }
 
 /* Section Headers */
@@ -539,11 +581,11 @@ header h1 {
 }
 
 .info-card.overdue {
-    background: #fce8e9;
+    background: #fce8e8;
 }
 
 .info-card.overdue .info-value {
-    color: #721c24;
+    color: #b71c1c;
 }
 
 .info-label {
@@ -621,6 +663,7 @@ header h1 {
     border-radius: 15px;
     z-index: 2;
     cursor: pointer;
+    box-shadow: 4px 0 6px rgba(0, 0, 0, 0.2);
 }
 
 .progress-tooltip {
@@ -662,6 +705,16 @@ header h1 {
 
 .progress-target-fill.completed {
     background: rgba(40, 167, 69, 0.3);
+}
+
+.progress-ahead-fill {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+    transition: width 0.5s ease;
+    border-radius: 15px;
+    z-index: 1;
+    cursor: pointer;
 }
 
 .progress-text {
@@ -736,7 +789,7 @@ header h1 {
 /* Footer */
 footer {
     text-align: center;
-    color: white;
+    color: #666;
     margin-top: 30px;
     opacity: 0.8;
     position: relative;
@@ -825,5 +878,579 @@ footer {
     
     .goal-item-actions {
         align-self: flex-end;
+    }
+}
+
+/* Debug Panel Styles */
+.debug-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    background: #000;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    border: 1px solid #00ff00;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.debug-panel.hidden {
+    display: none;
+}
+
+.debug-panel.debug-panel-visible {
+    display: block;
+    animation: debugPanelSlideIn 0.5s ease-out;
+}
+
+@keyframes debugPanelSlideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.debug-header {
+    background: #001100;
+    padding: 8px 12px;
+    border-bottom: 1px solid #00ff00;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.debug-title {
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+.debug-toggle {
+    background: none;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.debug-toggle:hover {
+    background: #00ff00;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.debug-content {
+    padding: 12px;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.debug-content.collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+}
+
+.debug-content.expanding {
+    animation: debugExpand 0.3s ease-out forwards;
+}
+
+.debug-content.collapsing {
+    animation: debugCollapse 0.3s ease-out forwards;
+}
+
+@keyframes debugExpand {
+    from {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 200px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        opacity: 1;
+    }
+}
+
+@keyframes debugCollapse {
+    from {
+        max-height: 200px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        opacity: 1;
+    }
+    to {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+    }
+}
+
+.debug-info {
+    margin-bottom: 15px;
+}
+
+.debug-line {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.debug-value {
+    color: #00ffff;
+    text-shadow: 0 0 3px #00ffff;
+}
+
+.debug-controls {
+    border-top: 1px solid #004400;
+    padding-top: 10px;
+}
+
+.debug-input-group {
+    margin-bottom: 10px;
+}
+
+.debug-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #00ff00;
+}
+
+.debug-input {
+    width: 120px;
+    background: #001100;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 4px 6px;
+    font-family: monospace;
+    font-size: 11px;
+    border-radius: 3px;
+    margin-right: 8px;
+}
+
+.debug-input:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+/* Fix date picker styling for dark theme */
+.debug-input[type="date"] {
+    color: #00ff00;
+    background: #001100;
+}
+
+.debug-input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) hue-rotate(90deg) brightness(1.5);
+    cursor: pointer;
+}
+
+.debug-input[type="date"]::-webkit-datetime-edit {
+    color: #00ff00;
+}
+
+.debug-input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    color: #00ff00;
+}
+
+.debug-input[type="date"]::-webkit-datetime-edit-text {
+    color: #00ff00;
+}
+
+.debug-input[type="date"]::-webkit-datetime-edit-month-field,
+.debug-input[type="date"]::-webkit-datetime-edit-day-field,
+.debug-input[type="date"]::-webkit-datetime-edit-year-field {
+    color: #00ff00;
+    background: transparent;
+}
+
+/* Firefox date input styling */
+.debug-input[type="date"]::-moz-placeholder {
+    color: #00ff00;
+    opacity: 0.7;
+}
+
+.debug-btn {
+    background: #001100;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 4px 8px;
+    font-family: monospace;
+    font-size: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.debug-btn:hover {
+    background: #00ff00;
+    color: #000;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+.debug-btn-reset {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.debug-btn-reset:hover {
+    background: #ff0000;
+    border-color: #ff0000;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+}
+
+.debug-btn-danger {
+    width: 100%;
+    margin-top: 5px;
+    background: #220000;
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.debug-btn-danger:hover {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: #000;
+    box-shadow: 0 0 12px rgba(255, 68, 68, 0.6);
+}
+
+/* Debug panel responsive */
+@media (max-width: 768px) {
+    .debug-panel {
+        width: 280px;
+        bottom: 10px;
+        left: 10px;
+    }
+}
+
+/* Matrix-style Cache Wipe Confirmation Dialog */
+.matrix-confirmation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.matrix-confirmation-overlay.matrix-confirmation-visible {
+    opacity: 1;
+}
+
+.matrix-confirmation-dialog {
+    background: #000;
+    border: 2px solid #ff0000;
+    border-radius: 8px;
+    min-width: 400px;
+    max-width: 90vw;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.matrix-confirmation-visible .matrix-confirmation-dialog {
+    transform: scale(1);
+}
+
+.matrix-header {
+    background: #330000;
+    border-bottom: 1px solid #ff0000;
+    padding: 12px 20px;
+    border-radius: 6px 6px 0 0;
+}
+
+.matrix-title {
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 0 8px #ff0000;
+    letter-spacing: 2px;
+}
+
+.matrix-content {
+    padding: 20px;
+    color: #ff3333;
+}
+
+.matrix-warning-line {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #ff4444;
+    font-weight: bold;
+    text-shadow: 0 0 8px #ff2222;
+    animation: matrixBlink 2s infinite;
+}
+
+.matrix-stats {
+    margin: 15px 0;
+    padding: 10px;
+    border: 1px solid #440000;
+    background: #110000;
+    border-radius: 4px;
+}
+
+.matrix-stat {
+    margin: 5px 0;
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.matrix-value {
+    color: #ffff00;
+    text-shadow: 0 0 5px #ffff00;
+}
+
+.matrix-question {
+    margin-top: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    color: #ff8888;
+    text-shadow: 0 0 10px #ff3333;
+}
+
+.matrix-controls {
+    padding: 15px 20px;
+    border-top: 1px solid #440000;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    background: #110000;
+    border-radius: 0 0 6px 6px;
+}
+
+.matrix-btn {
+    flex: 1;
+    padding: 8px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+}
+
+.matrix-btn-abort {
+    background: #001100;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+}
+
+.matrix-btn-abort:hover {
+    background: #00ff00;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+.matrix-btn-execute {
+    background: #330000;
+    border: 1px solid #ff0000;
+    color: #ff0000;
+}
+
+.matrix-btn-execute:hover {
+    background: #ff0000;
+    color: #000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+}
+
+@keyframes matrixBlink {
+    0%, 50%, 100% { 
+        opacity: 1;
+        text-shadow: 0 0 8px #ff2222;
+    }
+    25%, 75% { 
+        opacity: 0.8;
+        text-shadow: 0 0 12px #ff4444;
+    }
+}
+
+/* Matrix-style Success Dialog */
+.matrix-success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.matrix-success-overlay.matrix-success-visible {
+    opacity: 1;
+}
+
+.matrix-success-dialog {
+    background: #000;
+    border: 2px solid #00ff00;
+    border-radius: 8px;
+    min-width: 350px;
+    max-width: 90vw;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.matrix-success-visible .matrix-success-dialog {
+    transform: scale(1);
+}
+
+.matrix-success-header {
+    background: #001100;
+    border-bottom: 1px solid #00ff00;
+    padding: 12px 20px;
+    border-radius: 6px 6px 0 0;
+}
+
+.matrix-success-title {
+    color: #00ff00;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 0 8px #00ff00;
+    letter-spacing: 2px;
+}
+
+.matrix-success-content {
+    padding: 20px;
+    color: #33ff33;
+    text-align: center;
+}
+
+.matrix-success-line {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #44ff44;
+    text-shadow: 0 0 8px #22ff22;
+    animation: matrixGlow 1.5s infinite;
+}
+
+.matrix-success-controls {
+    padding: 15px 20px;
+    border-top: 1px solid #004400;
+    display: flex;
+    justify-content: center;
+    background: #001100;
+    border-radius: 0 0 6px 6px;
+}
+
+.matrix-btn-close {
+    background: #001100;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 8px 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+}
+
+.matrix-btn-close:hover {
+    background: #00ff00;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+@keyframes matrixGlow {
+    0%, 100% { 
+        text-shadow: 0 0 8px #22ff22;
+    }
+    50% { 
+        text-shadow: 0 0 15px #44ff44, 0 0 25px #22ff22;
+    }
+}
+
+/* Field Validation Error Styles */
+.field-error {
+    border: 2px solid #ff4444 !important;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important;
+    animation: errorShake 0.5s ease-in-out;
+}
+
+.form-group-error label {
+    color: #ff4444 !important;
+}
+
+.field-error-tooltip {
+    background: #ff4444;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
+    animation: tooltipSlideIn 0.3s ease-out;
+    pointer-events: none;
+}
+
+.field-error-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #ff4444;
+}
+
+@keyframes errorShake {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 70% {
+        transform: translateX(-3px);
+    }
+    40%, 60% {
+        transform: translateX(3px);
+    }
+}
+
+@keyframes tooltipSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

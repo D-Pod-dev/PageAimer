@@ -35,6 +35,11 @@ class ReadingGoalTracker {
         if (this.currentGoalId && !document.getElementById('goal-dashboard').classList.contains('hidden')) {
             this.updateGoalDashboard();
         }
+
+        // Update debug info if panel exists
+        if (document.getElementById('debug-panel')) {
+            this.updateDebugInfo();
+        }
     }
 
     getTodayDateString() {
@@ -47,6 +52,300 @@ class ReadingGoalTracker {
         const today = this.debugDate || new Date();
         today.setHours(0, 0, 0, 0);
         return today;
+    }
+
+    showDebugPanel() {
+        // Create debug panel if it doesn't exist
+        if (!document.getElementById('debug-panel')) {
+            this.createDebugPanel();
+        }
+        
+        // Show the debug panel
+        const debugPanel = document.getElementById('debug-panel');
+        debugPanel.classList.remove('hidden');
+        debugPanel.classList.add('debug-panel-visible');
+        
+        // Update debug info
+        this.updateDebugInfo();
+    }
+
+    createDebugPanel() {
+        const debugPanel = document.createElement('div');
+        debugPanel.id = 'debug-panel';
+        debugPanel.className = 'debug-panel hidden';
+        debugPanel.innerHTML = `
+            <div class="debug-header">
+                <span class="debug-title">DEBUG CONSOLE</span>
+                <button class="debug-toggle" onclick="tracker.toggleDebugPanel()">−</button>
+            </div>
+            <div class="debug-content">
+                <div class="debug-info">
+                    <div class="debug-line">System Status: <span class="debug-value">ACTIVE</span></div>
+                    <div class="debug-line">Current Date: <span id="debug-current-date" class="debug-value"></span></div>
+                    <div class="debug-line">Debug Date: <span id="debug-debug-date" class="debug-value">NULL</span></div>
+                    <div class="debug-line">Total Goals: <span id="debug-goal-count" class="debug-value">0</span></div>
+                </div>
+                <div class="debug-controls">
+                    <div class="debug-input-group">
+                        <label>Set Debug Date:</label>
+                        <input type="date" id="debug-date-input" class="debug-input">
+                        <button onclick="tracker.setDebugDateFromPanel()" class="debug-btn">SET</button>
+                    </div>
+                    <button onclick="tracker.resetDebugDate()" class="debug-btn debug-btn-reset">RESET DATE</button>
+                    <button onclick="tracker.showCacheWipeConfirmation()" class="debug-btn debug-btn-danger">CACHE WIPE</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(debugPanel);
+    }
+
+    toggleDebugPanel() {
+        const debugPanel = document.getElementById('debug-panel');
+        const content = debugPanel.querySelector('.debug-content');
+        const toggle = debugPanel.querySelector('.debug-toggle');
+        
+        if (content.classList.contains('collapsed')) {
+            // Expanding
+            content.classList.remove('collapsed');
+            content.classList.add('expanding');
+            toggle.textContent = '−';
+            
+            // Remove expanding class after animation
+            setTimeout(() => {
+                content.classList.remove('expanding');
+            }, 300);
+        } else {
+            // Collapsing
+            content.classList.add('collapsing');
+            toggle.textContent = '+';
+            
+            // Add collapsed class after animation
+            setTimeout(() => {
+                content.classList.remove('collapsing');
+                content.classList.add('collapsed');
+            }, 300);
+        }
+    }
+
+    setDebugDateFromPanel() {
+        const dateInput = document.getElementById('debug-date-input');
+        if (dateInput.value) {
+            this.setDebugDate(dateInput.value);
+            this.updateDebugInfo();
+        }
+    }
+
+    resetDebugDate() {
+        this.setDebugDate(null);
+        document.getElementById('debug-date-input').value = '';
+        this.updateDebugInfo();
+    }
+
+    showCacheWipeConfirmation() {
+        // Create Matrix-style confirmation dialog
+        const overlay = document.createElement('div');
+        overlay.className = 'matrix-confirmation-overlay';
+        overlay.innerHTML = `
+            <div class="matrix-confirmation-dialog">
+                <div class="matrix-header">
+                    <span class="matrix-title">SYSTEM WARNING</span>
+                </div>
+                <div class="matrix-content">
+                    <div class="matrix-warning-line">ATTENTION: CRITICAL OPERATION DETECTED</div>
+                    <div class="matrix-warning-line">ALL READING GOALS WILL BE PERMANENTLY DELETED</div>
+                    <div class="matrix-warning-line">THIS ACTION CANNOT BE UNDONE</div>
+                    <div class="matrix-stats">
+                        <div class="matrix-stat">GOALS TO DELETE: <span class="matrix-value">${this.goals.length}</span></div>
+                        <div class="matrix-stat">CACHE STATUS: <span class="matrix-value">ACTIVE</span></div>
+                    </div>
+                    <div class="matrix-question">PROCEED WITH CACHE WIPE?</div>
+                </div>
+                <div class="matrix-controls">
+                    <button class="matrix-btn matrix-btn-abort" onclick="tracker.cancelCacheWipe()">ABORT</button>
+                    <button class="matrix-btn matrix-btn-execute" onclick="tracker.executeCacheWipe()">EXECUTE</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        // Animate dialog appearance
+        setTimeout(() => {
+            overlay.classList.add('matrix-confirmation-visible');
+        }, 10);
+    }
+
+    cancelCacheWipe() {
+        const overlay = document.querySelector('.matrix-confirmation-overlay');
+        if (overlay) {
+            overlay.classList.remove('matrix-confirmation-visible');
+            setTimeout(() => {
+                document.body.removeChild(overlay);
+            }, 300);
+        }
+    }
+
+    executeCacheWipe() {
+        // Clear all goals
+        this.goals = [];
+        this.currentGoalId = null;
+        this.editingGoalId = null;
+        this.selectedGoalIds.clear();
+        this.bulkDeleteMode = false;
+        
+        // Clear localStorage
+        localStorage.removeItem('readingGoals');
+        localStorage.removeItem('readingGoal'); // Also remove old format if it exists
+        
+        // Update display
+        this.updateDisplay();
+        this.updateDebugInfo();
+        
+        // Hide goal dashboard if visible
+        document.getElementById('goal-dashboard').classList.add('hidden');
+        
+        // Show success message
+        this.showCacheWipeSuccess();
+        
+        // Close confirmation dialog
+        this.cancelCacheWipe();
+    }
+
+    showCacheWipeSuccess() {
+        const overlay = document.createElement('div');
+        overlay.className = 'matrix-success-overlay';
+        overlay.innerHTML = `
+            <div class="matrix-success-dialog">
+                <div class="matrix-success-header">
+                    <span class="matrix-success-title">OPERATION COMPLETE</span>
+                </div>
+                <div class="matrix-success-content">
+                    <div class="matrix-success-line">CACHE SUCCESSFULLY WIPED</div>
+                    <div class="matrix-success-line">ALL GOALS REMOVED FROM MEMORY</div>
+                    <div class="matrix-success-line">SYSTEM READY FOR NEW DATA</div>
+                </div>
+                <div class="matrix-success-controls">
+                    <button class="matrix-btn matrix-btn-close" onclick="tracker.closeCacheWipeSuccess()">CLOSE</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        // Animate success dialog
+        setTimeout(() => {
+            overlay.classList.add('matrix-success-visible');
+        }, 10);
+    }
+
+    closeCacheWipeSuccess() {
+        const overlay = document.querySelector('.matrix-success-overlay');
+        if (overlay) {
+            overlay.classList.remove('matrix-success-visible');
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            }, 300);
+        }
+    }
+
+    updateDebugInfo() {
+        const currentDateEl = document.getElementById('debug-current-date');
+        const debugDateEl = document.getElementById('debug-debug-date');
+        const goalCountEl = document.getElementById('debug-goal-count');
+        
+        if (currentDateEl) {
+            const currentDate = new Date();
+            currentDateEl.textContent = currentDate.toISOString().split('T')[0];
+        }
+        
+        if (debugDateEl) {
+            debugDateEl.textContent = this.debugDate ? this.debugDate.toISOString().split('T')[0] : 'NULL';
+        }
+        
+        if (goalCountEl) {
+            goalCountEl.textContent = this.goals.length.toString();
+        }
+    }
+
+    showFieldValidationErrors(targetPageEmpty, dueDateEmpty) {
+        // Clear any existing validation errors first
+        this.clearFieldValidationErrors();
+        
+        if (targetPageEmpty) {
+            this.showFieldError('target-page', 'Target page is required');
+        }
+        
+        if (dueDateEmpty) {
+            this.showFieldError('due-date', 'Due date is required');
+        }
+    }
+
+    showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const formGroup = field.closest('.form-group');
+        
+        // Add error styling
+        field.classList.add('field-error');
+        formGroup.classList.add('form-group-error');
+        
+        // Create and show tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'field-error-tooltip';
+        tooltip.textContent = message;
+        
+        // Position tooltip above the field
+        const rect = field.getBoundingClientRect();
+        tooltip.style.position = 'fixed';
+        tooltip.style.left = rect.left + 'px';
+        tooltip.style.top = (rect.top - 35) + 'px';
+        tooltip.style.zIndex = '10000';
+        
+        document.body.appendChild(tooltip);
+        
+        // Store reference for cleanup
+        field.errorTooltip = tooltip;
+        
+        // Add event listener to clear error when user types/changes value
+        const clearErrorOnInput = () => {
+            this.clearFieldError(fieldId);
+            field.removeEventListener('input', clearErrorOnInput);
+            field.removeEventListener('change', clearErrorOnInput);
+        };
+        
+        field.addEventListener('input', clearErrorOnInput);
+        field.addEventListener('change', clearErrorOnInput);
+    }
+
+    clearFieldError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const formGroup = field.closest('.form-group');
+        
+        if (field.classList.contains('field-error')) {
+            field.classList.remove('field-error');
+            formGroup.classList.remove('form-group-error');
+            
+            // Remove tooltip if exists
+            if (field.errorTooltip) {
+                field.errorTooltip.remove();
+                delete field.errorTooltip;
+            }
+        }
+    }
+
+    clearFieldValidationErrors() {
+        // Remove error classes
+        document.querySelectorAll('.field-error').forEach(field => {
+            field.classList.remove('field-error');
+            // Remove tooltip if exists
+            if (field.errorTooltip) {
+                field.errorTooltip.remove();
+                delete field.errorTooltip;
+            }
+        });
+        
+        document.querySelectorAll('.form-group-error').forEach(group => {
+            group.classList.remove('form-group-error');
+        });
     }
 
     generateId() {
@@ -120,9 +419,11 @@ class ReadingGoalTracker {
             this.updateProgress();
         });
 
-        // Reset goal button (now creates new goal)
-        document.getElementById('reset-goal').addEventListener('click', () => {
-            this.showCreateGoalSection();
+        // Edit goal button
+        document.getElementById('edit-goal-button').addEventListener('click', () => {
+            if (this.currentGoalId) {
+                this.showEditGoalSection(this.currentGoalId);
+            }
         });
 
         // Bulk delete functionality
@@ -160,13 +461,13 @@ class ReadingGoalTracker {
     setupTooltipListeners() {
         // Use event delegation for dynamic content
         document.addEventListener('mouseenter', (e) => {
-            if (e.target.dataset.tooltip) {
+            if (e.target && e.target.dataset && e.target.dataset.tooltip) {
                 this.showTooltip(e.target, e.target.dataset.tooltip, e.target.dataset.goalId);
             }
         }, true);
         
         document.addEventListener('mouseleave', (e) => {
-            if (e.target.dataset.tooltip) {
+            if (e.target && e.target.dataset && e.target.dataset.tooltip) {
                 this.hideTooltip(e.target);
             }
         }, true);
@@ -190,22 +491,49 @@ class ReadingGoalTracker {
         
         // Set tooltip message based on type
         if (type === 'current-progress') {
-            message = `Current page: ${goal.currentPage}`;
+            const todaysTarget = this.getTodaysTargetPage(goal);
+            if (goal.currentPage >= todaysTarget) {
+                // When at or ahead of target, blue bar shows target
+                message = `Today's target page: ${todaysTarget}`;
+            } else {
+                // When behind target, blue bar shows current progress
+                message = `Current page: ${goal.currentPage}`;
+            }
         } else if (type === 'today-target') {
             const todaysTarget = this.getTodaysTargetPage(goal);
             message = `Today's target page: ${todaysTarget}`;
+        } else if (type === 'ahead-progress') {
+            const todaysTarget = this.getTodaysTargetPage(goal);
+            const aheadPages = Math.max(0, goal.currentPage - todaysTarget);
+            if (aheadPages > 0) {
+                message = `${aheadPages} page${aheadPages === 1 ? '' : 's'} ahead of today's target`;
+            } else {
+                message = '';
+            }
         }
         
         if (message) {
             tooltipElement.textContent = message;
             
             // Position tooltip at the rightmost point of the hovered element
-            // Get the width percentage from the element's style
-            const widthMatch = element.style.width.match(/(\d+(?:\.\d+)?)%/);
-            const widthPercent = widthMatch ? parseFloat(widthMatch[1]) : 0;
+            let tooltipPosition;
+            
+            if (type === 'ahead-progress') {
+                // For ahead progress, position at the total progress (target + ahead)
+                const leftMatch = element.style.left.match(/(\d+(?:\.\d+)?)%/);
+                const widthMatch = element.style.width.match(/(\d+(?:\.\d+)?)%/);
+                const leftPos = leftMatch ? parseFloat(leftMatch[1]) : 0;
+                const aheadWidth = widthMatch ? parseFloat(widthMatch[1]) : 0;
+                
+                tooltipPosition = leftPos + aheadWidth;
+            } else {
+                // For other progress types, use the element's width directly
+                const widthMatch = element.style.width.match(/(\d+(?:\.\d+)?)%/);
+                tooltipPosition = widthMatch ? parseFloat(widthMatch[1]) : 0;
+            }
             
             // Calculate position as percentage of parent width
-            tooltipElement.style.left = `${widthPercent}%`;
+            tooltipElement.style.left = `${tooltipPosition}%`;
             tooltipElement.classList.add('show');
         }
     }
@@ -245,9 +573,23 @@ class ReadingGoalTracker {
         this.editingGoalId = goalId;
         const goal = this.goals.find(g => g.id === goalId);
         if (goal) {
-            document.getElementById('edit-book-title').value = goal.bookTitle === 'Your Book' ? '' : goal.bookTitle;
-            document.getElementById('edit-target-page').value = goal.targetPage;
-            document.getElementById('edit-due-date').value = goal.dueDate;
+            // Set current values as placeholders instead of filling the fields
+            const bookTitleField = document.getElementById('edit-book-title');
+            const targetPageField = document.getElementById('edit-target-page');
+            const currentPageField = document.getElementById('edit-current-page');
+            const dueDateField = document.getElementById('edit-due-date');
+            
+            bookTitleField.value = '';
+            bookTitleField.placeholder = goal.bookTitle === 'Your Book' ? 'Enter book title' : goal.bookTitle;
+            
+            targetPageField.value = '';
+            targetPageField.placeholder = goal.targetPage.toString();
+            
+            currentPageField.value = '';
+            currentPageField.placeholder = goal.currentPage.toString();
+            
+            dueDateField.value = goal.dueDate;
+            dueDateField.placeholder = '';
         }
         document.getElementById('edit-goal-section').classList.remove('hidden');
     }
@@ -268,13 +610,24 @@ class ReadingGoalTracker {
 
     createGoal() {
         const bookTitle = document.getElementById('book-title').value;
+        
+        // Check for debug trigger first, before any validation
+        if (bookTitle === '//tracker.debug()') {
+            this.showDebugPanel();
+            // Clear the form
+            document.getElementById('goal-form').reset();
+            // Return to goals menu
+            this.showAllGoalsSection();
+            return;
+        }
+        
         const targetPage = parseInt(document.getElementById('target-page').value);
         const currentPage = parseInt(document.getElementById('current-page').value) || 0;
         const dueDate = document.getElementById('due-date').value;
 
         // Validation
         if (!targetPage || !dueDate) {
-            alert('Please fill in all required fields.');
+            this.showFieldValidationErrors(!targetPage, !dueDate);
             return;
         }
 
@@ -306,24 +659,29 @@ class ReadingGoalTracker {
         this.goals.push(goal);
         this.saveGoals();
         this.showAllGoalsSection();
+        
+        // Update debug info if panel exists
+        if (document.getElementById('debug-panel')) {
+            this.updateDebugInfo();
+        }
     }
 
     updateGoal() {
         const goalIndex = this.goals.findIndex(g => g.id === this.editingGoalId);
         if (goalIndex === -1) return;
 
-        const bookTitle = document.getElementById('edit-book-title').value;
-        const targetPage = parseInt(document.getElementById('edit-target-page').value);
-        const dueDate = document.getElementById('edit-due-date').value;
+        const goal = this.goals[goalIndex];
+        
+        // Get values, defaulting to current values if fields are empty
+        const bookTitle = document.getElementById('edit-book-title').value || goal.bookTitle;
+        const targetPageInput = document.getElementById('edit-target-page').value;
+        const targetPage = targetPageInput ? parseInt(targetPageInput) : goal.targetPage;
+        const currentPageInput = document.getElementById('edit-current-page').value;
+        const currentPage = currentPageInput !== '' ? parseInt(currentPageInput) : goal.currentPage;
+        const dueDate = document.getElementById('edit-due-date').value || goal.dueDate;
 
         // Validation
-        if (!targetPage || !dueDate) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        const goal = this.goals[goalIndex];
-        if (goal.currentPage >= targetPage) {
+        if (currentPage >= targetPage) {
             alert('Target page must be greater than current page.');
             return;
         }
@@ -340,6 +698,7 @@ class ReadingGoalTracker {
         // Update goal
         goal.bookTitle = bookTitle || 'Your Book';
         goal.targetPage = targetPage;
+        goal.currentPage = currentPage;
         goal.dueDate = dueDate;
 
         // Recalculate today's target (force update since goal parameters changed)
@@ -361,6 +720,11 @@ class ReadingGoalTracker {
             this.closeAllDropdowns();
             this.renderGoalsList();
             this.updateDisplay();
+            
+            // Update debug info if panel exists
+            if (document.getElementById('debug-panel')) {
+                this.updateDebugInfo();
+            }
         }
     }
 
@@ -411,7 +775,14 @@ class ReadingGoalTracker {
         const today = this.getCurrentDate();
         const dueDate = new Date(goal.dueDate);
         dueDate.setHours(0, 0, 0, 0);
-        return dueDate <= today && !this.isGoalCompleted(goal);
+        return dueDate < today && !this.isGoalCompleted(goal);
+    }
+
+    isGoalDueToday(goal) {
+        const today = this.getCurrentDate();
+        const dueDate = new Date(goal.dueDate);
+        dueDate.setHours(0, 0, 0, 0);
+        return dueDate.getTime() === today.getTime() && !this.isGoalCompleted(goal);
     }
 
     deleteSelectedGoals() {
@@ -427,6 +798,11 @@ class ReadingGoalTracker {
             this.goals = this.goals.filter(goal => !this.selectedGoalIds.has(goal.id));
             this.saveGoals();
             this.exitBulkDeleteMode();
+            
+            // Update debug info if panel exists
+            if (document.getElementById('debug-panel')) {
+                this.updateDebugInfo();
+            }
         }
     }
 
@@ -599,21 +975,76 @@ class ReadingGoalTracker {
         if (this.goals.length === 0) {
             noGoalsEl.classList.remove('hidden');
             // Clear existing goals when no goals exist
-            const existingGoals = goalsListEl.querySelectorAll('.goal-item');
+            const existingGoals = goalsListEl.querySelectorAll('.goal-item, .completed-goals-section');
             existingGoals.forEach(item => item.remove());
             return;
         }
         
         noGoalsEl.classList.add('hidden');
         
-        // Clear existing goals (except no-goals-message)
-        const existingGoals = goalsListEl.querySelectorAll('.goal-item');
+        // Clear existing goals and sections
+        const existingGoals = goalsListEl.querySelectorAll('.goal-item, .completed-goals-section');
         existingGoals.forEach(item => item.remove());
         
+        // Separate active goals from completed goals
+        const activeGoals = [];
+        const completedGoals = [];
+        
         this.goals.forEach(goal => {
+            const isCompleted = this.isGoalCompleted(goal);
+            
+            // Only actually completed goals go to the completed section
+            if (isCompleted) {
+                completedGoals.push(goal);
+            } else {
+                activeGoals.push(goal);
+            }
+        });
+        
+        // Sort active goals by due date (earliest first)
+        const sortedActiveGoals = activeGoals.sort((a, b) => {
+            const dateA = new Date(a.dueDate);
+            const dateB = new Date(b.dueDate);
+            return dateA - dateB;
+        });
+        
+        // Sort completed goals by due date (earliest first)
+        const sortedCompletedGoals = completedGoals.sort((a, b) => {
+            const dateA = new Date(a.dueDate);
+            const dateB = new Date(b.dueDate);
+            return dateA - dateB;
+        });
+        
+        // Render active goals
+        sortedActiveGoals.forEach(goal => {
             const goalEl = this.createGoalElement(goal);
             goalsListEl.appendChild(goalEl);
         });
+        
+        // Render completed goals section if there are any completed/overdue goals
+        if (sortedCompletedGoals.length > 0) {
+            // Create completed goals section
+            const completedSection = document.createElement('div');
+            completedSection.className = 'completed-goals-section';
+            
+            // Add separator line and header
+            const separator = document.createElement('hr');
+            separator.className = 'completed-goals-separator';
+            completedSection.appendChild(separator);
+            
+            const header = document.createElement('h3');
+            header.className = 'completed-goals-header';
+            header.textContent = 'Completed Goals';
+            completedSection.appendChild(header);
+            
+            // Add completed goals
+            sortedCompletedGoals.forEach(goal => {
+                const goalEl = this.createGoalElement(goal);
+                completedSection.appendChild(goalEl);
+            });
+            
+            goalsListEl.appendChild(completedSection);
+        }
     }
 
     createGoalElement(goal) {
@@ -624,11 +1055,23 @@ class ReadingGoalTracker {
         const dailyGoal = this.calculateDailyGoal(goal);
         const isCompleted = this.isGoalCompleted(goal);
         const isOverdue = this.isGoalOverdue(goal);
+        const isDueToday = this.isGoalDueToday(goal);
+        
+        // Calculate ahead amount and base progress
+        const aheadAmount = Math.max(0, progress - todaysTargetProgress);
+        const baseProgress = Math.min(progress, todaysTargetProgress);
+        
+        // Set gradient for goal progress ahead fill
+        let gradientStyle = 'linear-gradient(90deg, #FFD700 0%, #FFA500 100%)';
+        if (progress > 0) {
+            const gradientStart = (todaysTargetProgress / progress) * 100;
+            gradientStyle = `linear-gradient(90deg, #FFD700 0%, #FFD700 ${gradientStart}%, #FFA500 100%)`;
+        }
         
         let goalClasses = `goal-item ${this.selectedGoalIds.has(goal.id) ? 'selected' : ''}`;
         if (isCompleted) {
             goalClasses += ' completed';
-        } else if (isOverdue) {
+        } else if (isOverdue || isDueToday) {
             goalClasses += ' overdue';
         }
         
@@ -656,7 +1099,8 @@ class ReadingGoalTracker {
                 <span class="goal-progress-text">${progress}%</span>
                 <div class="goal-progress-bar">
                     <div class="goal-progress-target-fill" style="width: ${todaysTargetProgress}%" data-tooltip="today-target" data-goal-id="${goal.id}"></div>
-                    <div class="goal-progress-fill" style="width: ${progress}%" data-tooltip="current-progress" data-goal-id="${goal.id}"></div>
+                    <div class="goal-progress-ahead-fill" style="width: ${progress}%; left: 0%; background: ${gradientStyle}" data-tooltip="ahead-progress" data-goal-id="${goal.id}"></div>
+                    <div class="goal-progress-fill" style="width: ${baseProgress}%" data-tooltip="current-progress" data-goal-id="${goal.id}"></div>
                     <div class="goal-progress-tooltip"></div>
                 </div>
                 <span class="goal-progress-text">${goal.currentPage}/${goal.targetPage}</span>
@@ -673,21 +1117,16 @@ class ReadingGoalTracker {
             </div>
         `;
         
-        // Add click handler for goal item (not in bulk delete mode)
-        if (!this.bulkDeleteMode) {
-            goalEl.addEventListener('click', (e) => {
-                if (!e.target.closest('.goal-item-actions')) {
+        // Add unified click handler that checks current mode
+        goalEl.addEventListener('click', (e) => {
+            if (!e.target.closest('.goal-item-actions')) {
+                if (this.bulkDeleteMode) {
+                    this.toggleGoalSelection(goal.id);
+                } else {
                     this.showGoalDashboard(goal.id);
                 }
-            });
-        } else {
-            // In bulk delete mode, clicking toggles selection
-            goalEl.addEventListener('click', (e) => {
-                if (!e.target.closest('.goal-item-actions')) {
-                    this.toggleGoalSelection(goal.id);
-                }
-            });
-        }
+            }
+        });
         
         // Handle checkbox change
         const checkbox = goalEl.querySelector('input[type="checkbox"]');
@@ -804,13 +1243,32 @@ class ReadingGoalTracker {
         
         const progressFillEl = document.getElementById('progress-fill');
         const progressTargetFillEl = document.getElementById('progress-target-fill');
+        const progressAheadFillEl = document.getElementById('progress-ahead-fill');
         
         // Remove any existing data attributes and add fresh ones
         progressFillEl.removeAttribute('data-goal-id');
         progressTargetFillEl.removeAttribute('data-goal-id');
+        progressAheadFillEl.removeAttribute('data-goal-id');
         
-        progressFillEl.style.width = `${progress}%`;
+        // Calculate ahead amount
+        const aheadAmount = Math.max(0, progress - todaysTargetProgress);
+        const baseProgress = Math.min(progress, todaysTargetProgress);
+        
+        // Blue shows actual current progress
+        progressFillEl.style.width = `${baseProgress}%`;
         progressTargetFillEl.style.width = `${todaysTargetProgress}%`;
+        
+        // Gold starts from beginning and shows full progress with dynamic gradient
+        progressAheadFillEl.style.width = `${progress}%`;
+        progressAheadFillEl.style.left = `0%`;
+        
+        // Set gradient so light color is behind blue, transition starts where blue ends
+        if (progress > 0) {
+            const gradientStart = (todaysTargetProgress / progress) * 100;
+            progressAheadFillEl.style.background = `linear-gradient(90deg, #FFD700 0%, #FFD700 ${gradientStart}%, #FFA500 100%)`;
+        } else {
+            progressAheadFillEl.style.background = 'linear-gradient(90deg, #FFD700 0%, #FFA500 100%)';
+        }
         
         if (isCompleted) {
             progressFillEl.classList.add('completed');
@@ -856,7 +1314,7 @@ class ReadingGoalTracker {
             selectAllCheckbox.indeterminate = someSelected && !allSelected;
         } else {
             bulkActions.classList.add('hidden');
-            bulkDeleteBtn.textContent = 'Select Goals';
+            bulkDeleteBtn.textContent = 'Delete Goals';
         }
         
         // Update goal dashboard if it's currently shown
