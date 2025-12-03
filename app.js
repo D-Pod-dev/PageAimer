@@ -73,6 +73,7 @@ class ReadingGoalTracker {
         const debugPanel = document.createElement('div');
         debugPanel.id = 'debug-panel';
         debugPanel.className = 'debug-panel hidden';
+        const initialCacheStatus = this.goals.length === 0 ? 'EMPTY' : 'ACTIVE';
         debugPanel.innerHTML = `
             <div class="debug-header">
                 <span class="debug-title">DEBUG CONSOLE</span>
@@ -84,6 +85,7 @@ class ReadingGoalTracker {
                     <div class="debug-line">Current Date: <span id="debug-current-date" class="debug-value"></span></div>
                     <div class="debug-line">Debug Date: <span id="debug-debug-date" class="debug-value">NULL</span></div>
                     <div class="debug-line">Total Goals: <span id="debug-goal-count" class="debug-value">0</span></div>
+                    <div class="debug-line">Cache Status: <span id="debug-cache-status" class="debug-value">${initialCacheStatus}</span></div>
                 </div>
                 <div class="debug-controls">
                     <div class="debug-input-group">
@@ -143,6 +145,7 @@ class ReadingGoalTracker {
 
     showCacheWipeConfirmation() {
         // Create Matrix-style confirmation dialog
+        const cacheStatus = this.goals.length === 0 ? 'EMPTY' : 'ACTIVE';
         const overlay = document.createElement('div');
         overlay.className = 'matrix-confirmation-overlay';
         overlay.innerHTML = `
@@ -156,7 +159,7 @@ class ReadingGoalTracker {
                     <div class="matrix-warning-line">THIS ACTION CANNOT BE UNDONE</div>
                     <div class="matrix-stats">
                         <div class="matrix-stat">GOALS TO DELETE: <span class="matrix-value">${this.goals.length}</span></div>
-                        <div class="matrix-stat">CACHE STATUS: <span class="matrix-value">ACTIVE</span></div>
+                        <div class="matrix-stat">CACHE STATUS: <span class="matrix-value">${cacheStatus}</span></div>
                     </div>
                     <div class="matrix-question">PROCEED WITH CACHE WIPE?</div>
                 </div>
@@ -252,6 +255,7 @@ class ReadingGoalTracker {
         const currentDateEl = document.getElementById('debug-current-date');
         const debugDateEl = document.getElementById('debug-debug-date');
         const goalCountEl = document.getElementById('debug-goal-count');
+        const cacheStatusEl = document.getElementById('debug-cache-status');
         
         if (currentDateEl) {
             const currentDate = new Date();
@@ -264,6 +268,11 @@ class ReadingGoalTracker {
         
         if (goalCountEl) {
             goalCountEl.textContent = this.goals.length.toString();
+        }
+
+        if (cacheStatusEl) {
+            // Show 'EMPTY' when there are no goals, otherwise show 'ACTIVE'
+            cacheStatusEl.textContent = this.goals.length === 0 ? 'EMPTY' : 'ACTIVE';
         }
     }
 
