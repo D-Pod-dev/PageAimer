@@ -565,6 +565,9 @@ class ReadingGoalTracker {
     }
 
     showAllGoalsSection() {
+        // Clear any field validation errors before switching views
+        this.clearFieldValidationErrors();
+
         this.hideAllSections();
         document.getElementById('all-goals-section').classList.remove('hidden');
         this.exitBulkDeleteMode();
@@ -572,12 +575,18 @@ class ReadingGoalTracker {
     }
 
     showCreateGoalSection() {
+        // Clear any field validation errors when opening the create form
+        this.clearFieldValidationErrors();
+
         this.hideAllSections();
         document.getElementById('create-goal-section').classList.remove('hidden');
         document.getElementById('goal-form').reset();
     }
 
     showEditGoalSection(goalId) {
+        // Clear any field validation errors when opening the edit form
+        this.clearFieldValidationErrors();
+
         this.hideAllSections();
         this.editingGoalId = goalId;
         const goal = this.goals.find(g => g.id === goalId);
